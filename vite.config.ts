@@ -11,6 +11,7 @@ export default defineConfig(({ command, mode }) => {
   const isDemo = mode === 'demo'
   
   return {
+    base: isDemo ? '/vue-tufte/' : '/',
     plugins: [
       vue({
         template: {
@@ -35,7 +36,6 @@ export default defineConfig(({ command, mode }) => {
       },
     },
     // Conditional build configuration
-    base: isDemo ? '/vue-tufte/' : '/',
     build: isDemo 
       ? {
           // Demo site build - builds index.html and assets
