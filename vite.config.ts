@@ -7,41 +7,56 @@ import dts from 'vite-plugin-dts'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    vue({
-      template: {
-        compilerOptions: {
-          whitespace: 'preserve'
+export default defineConfig(({ command, mode }) => {
+  const isDemo = mode === 'demo'
+  
+  return {
+    plugins: [
+      vue({
+        template: {
+          compilerOptions: {
+            whitespace: 'preserve'
+          }
         }
-      }
-    }),
-    dts({
-      insertTypesEntry: true,
-      outDir: 'dist',
-      include: ['src/**/*']
-    }),
-    cssInjectedByJsPlugin(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      }),
+      // Only include library-specific plugins for library build
+      ...(isDemo ? [] : [
+        dts({
+          insertTypesEntry: true,
+          outDir: 'dist',
+          include: ['src/**/*']
+        }),
+        cssInjectedByJsPlugin(),
+      ])
+    ],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url))
+      },
     },
-  },
-  build: {
-    lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'VueTufte',
-      formats: ['es', 'umd'],
-      fileName: (format) => `vue-tufte.${format}.js`
-    },
-    rollupOptions: {
-      external: ['vue'],
-      output: {
-        globals: {
-          vue: 'Vue'
+    // Conditional build configuration
+    build: isDemo 
+      ? {
+          // Demo site build - builds index.html and assets
+          outDir: 'dist',
+          chunkSizeWarningLimit: 1000
         }
-      }
-    }
+      : {
+          // Library build - builds components for npm
+          lib: {
+            entry: resolve(__dirname, 'src/index.ts'),
+            name: 'VueTufte',
+            formats: ['es', 'umd'],
+            fileName: (format) => `vue-tufte.${format}.js`
+          },
+          rollupOptions: {
+            external: ['vue'],
+            output: {
+              globals: {
+                vue: 'Vue'
+              }
+            }
+          }
+        }
   }
 })
