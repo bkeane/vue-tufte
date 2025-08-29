@@ -35,6 +35,7 @@ export default defineConfig(({ command, mode }) => {
       },
     },
     // Conditional build configuration
+    base: isDemo ? '/vue-tufte/' : '/',
     build: isDemo 
       ? {
           // Demo site build - builds index.html and assets
