@@ -1,5 +1,5 @@
 import type { App } from 'vue'
-import type { CreateHighlighterOptions } from 'shiki'
+import type { BundledLanguage, BundledTheme } from 'shiki'
 import { createHighlighter } from 'shiki'
 import './assets/tufte.css'
 
@@ -37,14 +37,17 @@ export {
 
 // Plugin configuration interface
 export interface VueTufteOptions {
-  shiki?: CreateHighlighterOptions
+  shiki?: {
+    themes?: BundledTheme[]
+    langs?: BundledLanguage[]
+  }
 }
 
 // Global highlighter instance
 let globalHighlighter: any = null
 let highlighterPromise: Promise<any> | null = null
 
-export const getGlobalHighlighter = async (options?: CreateHighlighterOptions) => {
+export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], langs?: BundledLanguage[] }) => {
   if (globalHighlighter) {
     return globalHighlighter
   }
@@ -54,9 +57,9 @@ export const getGlobalHighlighter = async (options?: CreateHighlighterOptions) =
   }
 
   // Default configuration  
-  const defaultConfig: CreateHighlighterOptions = {
-    themes: ['nord', 'github-light'],
-    langs: ['javascript', 'typescript', 'html', 'css', 'bash', 'json', 'vue', 'text']
+  const defaultConfig = {
+    themes: ['nord', 'github-light'] as BundledTheme[],
+    langs: ['javascript', 'typescript', 'html', 'css', 'bash', 'json', 'vue'] as BundledLanguage[]
   }
   
   // Merge user config with defaults
@@ -72,25 +75,23 @@ export const getGlobalHighlighter = async (options?: CreateHighlighterOptions) =
 }
 
 // Plugin installation function
-export default {
-  install(app: App, options?: VueTufteOptions) {
-    // Initialize global highlighter with user config
-    if (options?.shiki) {
-      getGlobalHighlighter(options.shiki)
-    }
-
-    app.component('Article', Article)
-    app.component('Section', Section)
-    app.component('NewThought', NewThought)
-    app.component('Subtitle', Subtitle)
-    app.component('Sidenote', Sidenote)
-    app.component('MarginNote', MarginNote)
-    app.component('Epigraph', Epigraph)
-    app.component('Figure', Figure)
-    app.component('MarginFigure', MarginFigure)
-    app.component('FullWidthFigure', FullWidthFigure)
-    app.component('CodeBlock', CodeBlock)
-    app.component('Table', Table)
-    app.component('IFrame', IFrame)
+export const install = (app: App, options?: VueTufteOptions) => {
+  // Initialize global highlighter with user config
+  if (options?.shiki) {
+    getGlobalHighlighter(options.shiki)
   }
+
+  app.component('Article', Article)
+  app.component('Section', Section)
+  app.component('NewThought', NewThought)
+  app.component('Subtitle', Subtitle)
+  app.component('Sidenote', Sidenote)
+  app.component('MarginNote', MarginNote)
+  app.component('Epigraph', Epigraph)
+  app.component('Figure', Figure)
+  app.component('MarginFigure', MarginFigure)
+  app.component('FullWidthFigure', FullWidthFigure)
+  app.component('CodeBlock', CodeBlock)
+  app.component('Table', Table)
+  app.component('IFrame', IFrame)
 }
