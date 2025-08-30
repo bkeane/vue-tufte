@@ -1,6 +1,6 @@
 {
   "name": "vue-tufte",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vue 3 components implementing Edward Tufte's design principles",
   "author": "Brendan Keane <btkeane@gmail.com>",
   "license": "MIT",
@@ -8,7 +8,13 @@
     "type": "git",
     "url": "https://github.com/bkeane/vue-tufte.git"
   },
-  "keywords": ["vue", "tufte", "typography", "design", "components"],
+  "keywords": [
+    "vue",
+    "tufte",
+    "typography",
+    "design",
+    "components"
+  ],
   "private": false,
   "type": "module",
   "engines": {
