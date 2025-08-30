@@ -102,6 +102,12 @@ watch(() => [props.language, props.theme], highlightCode)
   margin-bottom: 1rem;
 }
 
+@media (max-width: 760px) {
+  .shiki-wrapper {
+    width: 97%;
+  }
+}
+
 .shiki-wrapper pre {
   padding: 1rem;
   overflow-x: auto;
@@ -125,6 +131,12 @@ pre:not(.shiki) {
   width: 55%;
   margin: 1rem 0;
   display: block;
+}
+
+@media (max-width: 760px) {
+  pre:not(.shiki) {
+    width: 97%;
+  }
 }
 
 .shiki-wrapper code {
