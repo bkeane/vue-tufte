@@ -64,7 +64,6 @@ export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], 
     langs: [...defaultConfig.langs, ...(configToUse.langs || [])]
   }
   
-  console.log('Shiki config:', config)
   
   highlighterPromise = createHighlighter(config).then(hl => {
     globalHighlighter = hl
@@ -79,7 +78,6 @@ export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], 
 const install = (app: App, options?: VueTufteOptions) => {
   // Store user config globally so CodeBlock components can access it
   if (options?.shiki) {
-    console.log('Plugin installing with shiki config:', options.shiki)
     userConfig = options.shiki
     getGlobalHighlighter(options.shiki)
   }
