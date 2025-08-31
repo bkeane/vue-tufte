@@ -4,8 +4,6 @@ import { createHighlighter } from 'shiki'
 import './assets/tufte.css'
 
 // Components
-import Article from './components/Article.vue'
-import Section from './components/Section.vue'
 import NewThought from './components/NewThought.vue'
 import Subtitle from './components/Subtitle.vue'
 import Sidenote from './components/Sidenote.vue'
@@ -15,13 +13,9 @@ import Figure from './components/Figure.vue'
 import MarginFigure from './components/MarginFigure.vue'
 import FullWidthFigure from './components/FullWidthFigure.vue'
 import CodeBlock from './components/CodeBlock.vue'
-import Table from './components/Table.vue'
-import IFrame from './components/IFrame.vue'
 
 // Export components
 export {
-  Article,
-  Section,
   NewThought,
   Subtitle,
   Sidenote,
@@ -30,9 +24,7 @@ export {
   Figure,
   MarginFigure,
   FullWidthFigure,
-  CodeBlock,
-  Table,
-  IFrame
+  CodeBlock
 }
 
 // Plugin configuration interface
@@ -65,7 +57,14 @@ export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], 
   
   // Use stored user config or provided options or defaults
   const configToUse = userConfig || options || {}
-  const config = { ...defaultConfig, ...configToUse }
+  
+  // Merge languages additively instead of replacing
+  const config = { 
+    themes: configToUse.themes || defaultConfig.themes,
+    langs: [...defaultConfig.langs, ...(configToUse.langs || [])]
+  }
+  
+  console.log('Shiki config:', config)
   
   highlighterPromise = createHighlighter(config).then(hl => {
     globalHighlighter = hl
@@ -80,12 +79,11 @@ export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], 
 export const install = (app: App, options?: VueTufteOptions) => {
   // Store user config globally so CodeBlock components can access it
   if (options?.shiki) {
+    console.log('Plugin installing with shiki config:', options.shiki)
     userConfig = options.shiki
     getGlobalHighlighter(options.shiki)
   }
 
-  app.component('Article', Article)
-  app.component('Section', Section)
   app.component('NewThought', NewThought)
   app.component('Subtitle', Subtitle)
   app.component('Sidenote', Sidenote)
@@ -95,8 +93,6 @@ export const install = (app: App, options?: VueTufteOptions) => {
   app.component('MarginFigure', MarginFigure)
   app.component('FullWidthFigure', FullWidthFigure)
   app.component('CodeBlock', CodeBlock)
-  app.component('Table', Table)
-  app.component('IFrame', IFrame)
 }
 
 // Default export for app.use(VueTufte)

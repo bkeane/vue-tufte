@@ -17,9 +17,6 @@
   ],
   "private": false,
   "type": "module",
-  "engines": {
-    "node": "^20.19.0 || >=22.12.0"
-  },
   "main": "./dist/vue-tufte.umd.js",
   "module": "./dist/vue-tufte.es.js",
   "types": "./dist/index.d.ts",
@@ -33,11 +30,11 @@
     "dist"
   ],
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --config docs/vite.config.ts docs",
     "build": "run-p type-check \"build-only {@}\" --",
-    "build-demo": "vite build --mode demo --base=/vue-tufte/",
-    "preview": "vite preview",
+    "build:docs": "vite build --config docs/vite.config.ts docs --base=/vue-tufte/",
     "build-only": "vite build",
+    "preview": "vite preview --config docs/vite.config.ts docs",
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
@@ -53,5 +50,8 @@
     "vite-plugin-css-injected-by-js": "^3.5.2",
     "vite-plugin-dts": "^4.5.4",
     "vue-tsc": "^3.0.4"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
   }
 }
