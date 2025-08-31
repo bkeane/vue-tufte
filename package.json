@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bkeane/vue-tufte.git"
+    "url": "git+https://github.com/bkeane/vue-tufte.git"
   },
   "keywords": [
     "vue",

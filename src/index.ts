@@ -76,7 +76,7 @@ export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], 
 }
 
 // Plugin installation function
-export const install = (app: App, options?: VueTufteOptions) => {
+const install = (app: App, options?: VueTufteOptions) => {
   // Store user config globally so CodeBlock components can access it
   if (options?.shiki) {
     console.log('Plugin installing with shiki config:', options.shiki)
@@ -95,7 +95,6 @@ export const install = (app: App, options?: VueTufteOptions) => {
   app.component('CodeBlock', CodeBlock)
 }
 
-// Default export for app.use(VueTufte)
-export default {
-  install
-}
+// Export install as both named and default
+export { install }
+export default { install }

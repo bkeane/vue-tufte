@@ -55,7 +55,8 @@ export default defineConfig(({ command, mode }) => {
             output: {
               globals: {
                 vue: 'Vue'
-              }
+              },
+              exports: 'named'
             }
           }
         }
