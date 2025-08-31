@@ -11,20 +11,18 @@ const marginNoteId = ref(`mn-${Date.now()}-${Math.random().toString(36).substr(2
 
 // Validate proper usage context
 onMounted(() => {
-  if (import.meta.env.DEV) {
-    const instance = getCurrentInstance()
-    const parentElement = instance?.vnode?.el?.parentElement
+  const instance = getCurrentInstance()
+  const parentElement = instance?.vnode?.el?.parentElement
+  
+  if (parentElement) {
+    const validBlockElements = ['P', 'DIV', 'SECTION', 'ARTICLE', 'BLOCKQUOTE', 'MAIN', 'ASIDE']
+    const isInValidContext = validBlockElements.includes(parentElement.tagName)
     
-    if (parentElement) {
-      const validBlockElements = ['P', 'DIV', 'SECTION', 'ARTICLE', 'BLOCKQUOTE', 'MAIN', 'ASIDE']
-      const isInValidContext = validBlockElements.includes(parentElement.tagName)
-      
-      if (!isInValidContext) {
-        console.warn(
-          `⚠️ MarginNote should be used within block elements (${validBlockElements.map(t => t.toLowerCase()).join(', ')}) for proper positioning. ` +
-          `Currently in: ${parentElement.tagName.toLowerCase()}`
-        )
-      }
+    if (!isInValidContext) {
+      console.error(
+        `❌ MarginNote must be used within block elements (${validBlockElements.map(t => t.toLowerCase()).join(', ')}) for proper positioning. ` +
+        `Currently in: ${parentElement.tagName.toLowerCase()}. Layout will not work correctly.`
+      )
     }
   }
 })

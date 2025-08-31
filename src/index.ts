@@ -46,6 +46,7 @@ export interface VueTufteOptions {
 // Global highlighter instance
 let globalHighlighter: any = null
 let highlighterPromise: Promise<any> | null = null
+let userConfig: { themes?: BundledTheme[], langs?: BundledLanguage[] } | null = null
 
 export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], langs?: BundledLanguage[] }) => {
   if (globalHighlighter) {
@@ -59,11 +60,12 @@ export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], 
   // Default configuration  
   const defaultConfig = {
     themes: ['nord', 'github-light'] as BundledTheme[],
-    langs: ['javascript', 'typescript', 'html', 'css', 'bash', 'json', 'vue'] as BundledLanguage[]
+    langs: ['javascript', 'typescript', 'html', 'css', 'bash', 'json', 'vue', 'yaml'] as BundledLanguage[]
   }
   
-  // Merge user config with defaults
-  const config = options ? { ...defaultConfig, ...options } : defaultConfig
+  // Use stored user config or provided options or defaults
+  const configToUse = userConfig || options || {}
+  const config = { ...defaultConfig, ...configToUse }
   
   highlighterPromise = createHighlighter(config).then(hl => {
     globalHighlighter = hl
@@ -76,8 +78,9 @@ export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], 
 
 // Plugin installation function
 export const install = (app: App, options?: VueTufteOptions) => {
-  // Initialize global highlighter with user config
+  // Store user config globally so CodeBlock components can access it
   if (options?.shiki) {
+    userConfig = options.shiki
     getGlobalHighlighter(options.shiki)
   }
 
@@ -94,4 +97,9 @@ export const install = (app: App, options?: VueTufteOptions) => {
   app.component('CodeBlock', CodeBlock)
   app.component('Table', Table)
   app.component('IFrame', IFrame)
+}
+
+// Default export for app.use(VueTufte)
+export default {
+  install
 }
