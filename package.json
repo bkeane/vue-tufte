@@ -1,6 +1,6 @@
 {
   "name": "vue-tufte",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Vue 3 components implementing Edward Tufte's design principles",
   "author": "Brendan Keane <btkeane@gmail.com>",
   "license": "MIT",
