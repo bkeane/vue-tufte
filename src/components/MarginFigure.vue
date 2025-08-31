@@ -18,5 +18,5 @@ interface Props {
 
 defineProps<Props>()
 
-const marginFigureId = ref(`mn-figure-${Math.random().toString(36).substr(2, 9)}`)
+const marginFigureId = ref(`mn-figure-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`)
 </script>

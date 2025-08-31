@@ -63,8 +63,12 @@ async function highlightCode() {
     
     highlightedCode.value = modifiedHtml
   } catch (error) {
-    console.warn('Failed to highlight code:', error)
-    // Fallback to plain text
+    if (error?.message?.includes('Language') && error?.message?.includes('not found')) {
+      console.warn(`CodeBlock: Language '${props.language}' not supported by Shiki. Add it to your Shiki config or use a supported language.`)
+    } else {
+      console.warn('Failed to highlight code:', error)
+    }
+    // Fallback to plain text rendering
   }
 }
 

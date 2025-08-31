@@ -176,6 +176,7 @@ export default {
       <p>See <a href="https://shiki.style/guide/install#fine-grained-bundle" target="_blank">Shiki docs</a> for all configuration options.</p>
     </Section>
 
+
   </Article>
 </template>
 
@@ -191,4 +192,10 @@ import Figure from './components/Figure.vue'
 import MarginFigure from './components/MarginFigure.vue'
 import FullWidthFigure from './components/FullWidthFigure.vue'
 import CodeBlock from './components/CodeBlock.vue'
+
+// Test template variable for multiline preservation
+const gitCommands = `git init
+git add .
+git commit -m "initial commit"`
+
 </script>

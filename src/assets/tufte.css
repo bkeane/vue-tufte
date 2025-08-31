@@ -105,6 +105,7 @@ p {
     margin-bottom: 1.4rem;
     padding-right: 0;
     vertical-align: baseline;
+    width: 55%;
 }
 
 /* Chapter Epigraphs */
@@ -287,6 +288,12 @@ h3 > code {
     font-size: 1rem;
 }
 
+/* Fix margin figure caption positioning */
+.marginnote img {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
 pre > code {
     font-size: 0.9rem;
     width: 52.5%;
@@ -400,6 +407,13 @@ label.margin-toggle:not(.sidenote-number) {
         margin: 1rem 2.5%;
         vertical-align: baseline;
         position: relative;
+    }
+
+    /* Fix mobile scaling for margin figure images */
+    .margin-toggle:checked + .marginnote img {
+        max-width: 100%;
+        height: auto;
+        width: auto;
     }
 
     label {
