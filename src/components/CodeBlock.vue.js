@@ -25,26 +25,44 @@ async function highlightCode() {
     if (!code.trim()) {
         return;
     }
+    const hl = await getGlobalHighlighter();
+    // Helper function to attempt highlighting with dynamic loading
+    const attemptHighlight = async () => {
+        try {
+            return hl.codeToHtml(code, {
+                lang: props.language,
+                theme: props.theme
+            });
+        }
+        catch (error) {
+            const errorMessage = error?.message || '';
+            // Check if it's a language error
+            if (errorMessage.includes('Language') && errorMessage.includes('not found')) {
+                await hl.loadLanguage(props.language);
+                // Retry after loading language
+                return attemptHighlight();
+            }
+            // Check if it's a theme error
+            if (errorMessage.includes('Theme') && errorMessage.includes('not found')) {
+                await hl.loadTheme(props.theme);
+                // Retry after loading theme
+                return attemptHighlight();
+            }
+            // Re-throw if it's not a loading issue we can handle
+            throw error;
+        }
+    };
     try {
-        const hl = await getGlobalHighlighter();
-        // Get theme background color manually
+        const html = await attemptHighlight();
+        // Get theme background color after ensuring theme is loaded
         const themeInfo = hl.getTheme(props.theme);
         const bgColor = themeInfo?.bg || '#ffffff';
-        const html = hl.codeToHtml(code, {
-            lang: props.language,
-            theme: props.theme
-        });
         // Force the background color by modifying the HTML
         const modifiedHtml = html.replace(/style="([^"]*)"/, `style="$1; background-color: ${bgColor} !important;"`);
         highlightedCode.value = modifiedHtml;
     }
     catch (error) {
-        if (error?.message?.includes('Language') && error?.message?.includes('not found')) {
-            console.warn(`CodeBlock: Language '${props.language}' not supported by Shiki. Add it to your Shiki config or use a supported language.`);
-        }
-        else {
-            console.warn('Failed to highlight code:', error);
-        }
+        console.warn(`VueTufte: Failed to highlight ${props.language}/${props.theme}`, error?.message || error);
         // Fallback to plain text rendering
     }
 }

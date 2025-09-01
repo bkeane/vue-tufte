@@ -49,10 +49,10 @@ export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], 
     return highlighterPromise
   }
 
-  // Default configuration  
+  // Default configuration - minimal set since we can load languages and themes dynamically
   const defaultConfig = {
-    themes: ['nord', 'github-light'] as BundledTheme[],
-    langs: ['javascript', 'typescript', 'html', 'css', 'bash', 'json', 'vue', 'yaml'] as BundledLanguage[]
+    themes: ['nord'] as BundledTheme[], // Minimal set, others loaded on-demand
+    langs: ['javascript'] as BundledLanguage[] // Minimal set, others loaded on-demand
   }
   
   // Use stored user config or provided options or defaults
@@ -76,6 +76,8 @@ export const getGlobalHighlighter = async (options?: { themes?: BundledTheme[], 
 
 // Plugin installation function
 const install = (app: App, options?: VueTufteOptions) => {
+  console.log('🎨 VueTufte initializing...')
+  
   // Store user config globally so CodeBlock components can access it
   if (options?.shiki) {
     userConfig = options.shiki

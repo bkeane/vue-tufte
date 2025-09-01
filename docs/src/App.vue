@@ -13,12 +13,21 @@
       <h2>Installation</h2>
 
       <CodeBlock language="bash">npm install vue-tufte</CodeBlock>
+    </section>
+
+    <section>
+      <h2>Configuration</h2>
 
       <p>Import components individually:</p>
       <CodeBlock language="javascript">{{ individualImport }}</CodeBlock>
 
-      <p>Or install globally:</p>
-      <CodeBlock language="javascript">{{ pluginInstall }}</CodeBlock>
+      <p>Or install globally (no configuration needed):</p>
+      <CodeBlock language="javascript">{{ simpleConfigFull }}</CodeBlock>
+
+      <p>Optional: Pre-load specific languages/themes for performance:</p>
+      <CodeBlock language="javascript">{{ shikiConfigFull }}</CodeBlock>
+
+      <p>Browse available <a href="https://shiki.style/languages" target="_blank">languages</a> and <a href="https://shiki.style/themes" target="_blank">themes</a> in the Shiki docs.</p>
     </section>
 
     <section>
@@ -107,9 +116,6 @@
 
       <h3>Code Blocks</h3>
       
-      <p>Configure languages and themes at plugin install:</p>
-      <CodeBlock language="javascript">{{ shikiConfig }}</CodeBlock>
-
       <p>Basic usage:</p>
       <CodeBlock language="html">{{ codeBlockExample }}</CodeBlock>
       
@@ -118,9 +124,7 @@
       <p>With different theme:</p>
       <CodeBlock language="html">{{ themeExample }}</CodeBlock>
 
-      <CodeBlock language="yaml" theme="github-light">{{ yamlExample }}</CodeBlock>
-
-      <p>See <a href="https://shiki.style/guide/install#fine-grained-bundle" target="_blank">Shiki docs</a> for all configuration options.</p>
+      <CodeBlock language="yaml" theme="github-dark">{{ yamlExample }}</CodeBlock>
     </section>
 
 
@@ -133,7 +137,7 @@
 // Code examples
 const individualImport = `import { NewThought, Sidenote, Figure } from 'vue-tufte'`
 
-const pluginInstall = `import { createApp } from 'vue'
+const simpleConfigFull = `import { createApp } from 'vue'
 import VueTufte from 'vue-tufte'
 
 const app = createApp(App)
@@ -186,15 +190,17 @@ const epigraphExample = `<Epigraph>
   <template #footer>Edward Tufte</template>
 </Epigraph>`
 
-const shikiConfig = `import VueTufte from 'vue-tufte'
+const shikiConfigFull = `import { createApp } from 'vue'
+import VueTufte from 'vue-tufte'
 
-// Custom Shiki configuration
+const app = createApp(App)
 app.use(VueTufte, {
   shiki: {
     langs: ['python', 'rust', 'go'],
     themes: ['dracula', 'github-light']
   }
-})`
+})
+app.mount('#app')`
 
 const codeBlockExample = `<CodeBlock language="javascript">{{\`
 import { NewThought, Sidenote } from 'vue-tufte'
@@ -210,7 +216,7 @@ export default {
   components: { NewThought, Sidenote }
 }`
 
-const themeExample = `<CodeBlock language="yaml" theme="github-light">{{\`
+const themeExample = `<CodeBlock language="yaml" theme="github-dark">{{\`
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -227,4 +233,5 @@ metadata:
 data:
   database_url: postgres://localhost:5432/myapp
   redis_url: redis://localhost:6379`
+
 </script>

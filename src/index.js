@@ -23,10 +23,10 @@ export const getGlobalHighlighter = async (options) => {
     if (highlighterPromise) {
         return highlighterPromise;
     }
-    // Default configuration  
+    // Default configuration - minimal set since we can load languages and themes dynamically
     const defaultConfig = {
-        themes: ['nord', 'github-light'],
-        langs: ['javascript', 'typescript', 'html', 'css', 'bash', 'json', 'vue', 'yaml']
+        themes: ['nord'], // Minimal set, others loaded on-demand
+        langs: ['javascript'] // Minimal set, others loaded on-demand
     };
     // Use stored user config or provided options or defaults
     const configToUse = userConfig || options || {};
@@ -35,7 +35,6 @@ export const getGlobalHighlighter = async (options) => {
         themes: configToUse.themes || defaultConfig.themes,
         langs: [...defaultConfig.langs, ...(configToUse.langs || [])]
     };
-    console.log('Shiki config:', config);
     highlighterPromise = createHighlighter(config).then(hl => {
         globalHighlighter = hl;
         highlighterPromise = null;
@@ -45,9 +44,9 @@ export const getGlobalHighlighter = async (options) => {
 };
 // Plugin installation function
 const install = (app, options) => {
+    console.log('🎨 VueTufte initializing...');
     // Store user config globally so CodeBlock components can access it
     if (options?.shiki) {
-        console.log('Plugin installing with shiki config:', options.shiki);
         userConfig = options.shiki;
         getGlobalHighlighter(options.shiki);
     }
