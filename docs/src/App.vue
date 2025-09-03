@@ -1,7 +1,26 @@
 <template>
   <article>
-    <h1>Vue-Tufte</h1>
-    <Subtitle><a href="https://edwardtufte.github.io/tufte-css/" target="_blank">Tufte CSS</a> for Vue</Subtitle>
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; max-width: 90%; flex-wrap: wrap; gap: 1rem;">
+      <div style="flex-shrink: 0;">
+        <h1 style="margin: 0; white-space: nowrap;">Vue-Tufte</h1>
+        <Subtitle style="white-space: nowrap;"><a href="https://edwardtufte.github.io/tufte-css/" target="_blank">Tufte CSS</a> for Vue</Subtitle>
+      </div>
+      <Nav github="https://github.com/bkeane/vue-tufte">
+        <a href="#installation">Install</a>
+        <a href="#configuration">Config</a>
+        <a href="#components">Components</a>
+      </Nav>
+    </div>
+
+    <!-- Sticky hamburger menu when scrolled -->
+    <Nav 
+      sticky
+      github="https://github.com/bkeane/vue-tufte"
+    >
+      <a href="#installation">Install</a>
+      <a href="#configuration">Config</a>
+      <a href="#components">Components</a>
+    </Nav>
 
     <section>
       <p>
@@ -9,13 +28,13 @@
       </p>
     </section>
 
-    <section>
+    <section id="installation">
       <h2>Installation</h2>
 
       <CodeBlock language="bash">npm install vue-tufte</CodeBlock>
     </section>
 
-    <section>
+    <section id="configuration">
       <h2>Configuration</h2>
 
       <p>Import components individually:</p>
@@ -37,7 +56,7 @@
       <CodeBlock language="html">{{ documentStructure }}</CodeBlock>
     </section>
 
-    <section>
+    <section id="components">
       <h2>Text Components</h2>
 
       <h3>New Thought</h3>
@@ -67,7 +86,7 @@
       <CodeBlock language="html">{{ marginNoteExample }}</CodeBlock>
     </section>
 
-    <section>
+    <section id="examples">
       <h2>Figures</h2>
 
       <h3>Standard Figures</h3>
@@ -112,6 +131,15 @@
     </section>
 
     <section>
+      <h2>Navigation</h2>
+
+      <h3>Nav Component</h3>
+      <p>Navigation component with responsive hamburger menu behavior.</p>
+
+      <CodeBlock language="html">{{ navExample }}</CodeBlock>
+    </section>
+
+    <section>
       <h2>Code</h2>
 
       <h3>Code Blocks</h3>
@@ -133,6 +161,14 @@
 
 <script setup lang="ts">
 // Components are registered globally via the plugin in main.ts
+
+// Nav items for demo
+const navItems = [
+  { text: 'Home', href: '#home' },
+  { text: 'About', href: '#about' },
+  { text: 'Work', href: '#work' },
+  { text: 'Contact', href: '#contact' }
+]
 
 // Code examples
 const individualImport = `import { NewThought, Sidenote, Figure } from 'vue-tufte'`
@@ -233,5 +269,13 @@ metadata:
 data:
   database_url: postgres://localhost:5432/myapp
   redis_url: redis://localhost:6379`
+
+const navExample = `<Nav github="https://github.com/user/repo">
+  <a href="#home">Home</a>
+  <a href="#about">About</a>
+  <a href="#work">Work</a>
+  <a href="#contact">Contact</a>
+</Nav>`
+
 
 </script>

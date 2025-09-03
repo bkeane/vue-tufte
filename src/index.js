@@ -10,8 +10,9 @@ import Figure from './components/Figure.vue';
 import MarginFigure from './components/MarginFigure.vue';
 import FullWidthFigure from './components/FullWidthFigure.vue';
 import CodeBlock from './components/CodeBlock.vue';
+import Nav from './components/Nav.vue';
 // Export components
-export { NewThought, Subtitle, Sidenote, MarginNote, Epigraph, Figure, MarginFigure, FullWidthFigure, CodeBlock };
+export { NewThought, Subtitle, Sidenote, MarginNote, Epigraph, Figure, MarginFigure, FullWidthFigure, CodeBlock, Nav };
 // Global highlighter instance
 let globalHighlighter = null;
 let highlighterPromise = null;
@@ -59,6 +60,7 @@ const install = (app, options) => {
     app.component('MarginFigure', MarginFigure);
     app.component('FullWidthFigure', FullWidthFigure);
     app.component('CodeBlock', CodeBlock);
+    app.component('Nav', Nav);
 };
 // Export install as both named and default
 export { install };
