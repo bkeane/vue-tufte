@@ -14,7 +14,7 @@ npm install vue-tufte
 
 ```js
 import { createApp } from 'vue'
-import { install as VueTufte } from 'vue-tufte'
+import VueTufte from 'vue-tufte'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -77,9 +77,27 @@ export default {
 </template>
 ```
 
-## Code Highlighting Configuration
+## Code Highlighting
 
-Configure syntax highlighting themes and languages:
+CodeBlock components work automatically with any language or theme:
+
+```vue
+<CodeBlock language="javascript">
+  console.log('Automatic syntax highlighting!')
+</CodeBlock>
+
+<CodeBlock language="python" theme="github-dark">
+  print("Custom theme support")
+</CodeBlock>
+```
+
+Available languages and themes are automatically loaded on-demand. Browse all options:
+- **Languages**: [Shiki Language Reference](https://shiki.style/languages)
+- **Themes**: [Shiki Theme Reference](https://shiki.style/themes)
+
+### Optional: Pre-loading for Performance
+
+For better performance, you can pre-load specific languages and themes:
 
 ```js
 app.use(VueTufte, {
