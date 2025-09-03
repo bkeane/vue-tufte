@@ -1,7 +1,10 @@
 <template>
+  <!-- Single Nav element that handles both regular and sticky behavior -->
   <nav 
-    v-show="!sticky || showStickyNav"
     class="tufte-nav" 
+    :class="{
+      'sticky-active': sticky && showStickyNav
+    }"
     :data-sticky="sticky"
     :style="{
       '--delimiter': `'${delimiter}'`,
@@ -16,12 +19,14 @@
       v-show="showNav"
       class="nav"
     >
-      <slot />
-      <a v-if="github" :href="github" target="_blank" rel="noopener noreferrer" class="github-link">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-label="GitHub">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-        </svg>
-      </a>
+      <div class="nav-content">
+        <slot />
+        <a v-if="github" :href="github" target="_blank" rel="noopener noreferrer" class="github-link">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-label="GitHub">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+        </a>
+      </div>
     </div>
 
     <!-- Burger Navigation -->
@@ -80,83 +85,44 @@ const mobileMenuOpen = ref(false)
 const showStickyNav = ref(false)
 const isMobileViewport = ref(false)
 
-// Display logic: Nav shows when NOT mobile AND NOT sticky-active
+// Display logic: Nav shows when NOT mobile AND (NOT sticky OR NOT sticky-active)
 const showNav = computed(() => {
-  console.log('🖥️ Nav logic:', {
-    isMobile: isMobileViewport.value,
-    isSticky: props.sticky,
-    stickyActive: showStickyNav.value,
-    shouldShow: !isMobileViewport.value && !(props.sticky && showStickyNav.value)
-  })
-  return !isMobileViewport.value && !(props.sticky && showStickyNav.value)
+  return !isMobileViewport.value && (!props.sticky || !showStickyNav.value)
 })
 
 // Display logic: Burger shows when mobile OR sticky-active  
 const showBurger = computed(() => {
-  console.log('🍔 Burger logic:', {
-    isMobile: isMobileViewport.value,
-    isSticky: props.sticky,
-    stickyActive: showStickyNav.value,
-    shouldShow: isMobileViewport.value || (props.sticky && showStickyNav.value)
-  })
   return isMobileViewport.value || (props.sticky && showStickyNav.value)
 })
 
 const handleResize = () => {
-  const wasMobile = isMobileViewport.value
   isMobileViewport.value = window.innerWidth <= 760
-  
-  if (wasMobile !== isMobileViewport.value) {
-    console.log('📱 Viewport changed:', isMobileViewport.value ? 'MOBILE' : 'DESKTOP')
-  }
 }
 
 const handleScroll = () => {
   if (props.sticky) {
-    console.log('🔍 Scroll handler running for sticky nav')
+    const currentNav = document.querySelector(`[data-sticky="true"]`)
     
-    // Find all Nav components in the DOM
-    const allNavs = document.querySelectorAll('.tufte-nav')
-    console.log('📱 Found navs:', allNavs.length)
-    
-    const currentNav = document.querySelector(`[data-sticky="${props.sticky}"]`)
-    console.log('🎯 Current sticky nav:', currentNav)
-    
-    // Find the first non-sticky nav (header nav) to use as reference
-    const referenceNav = Array.from(allNavs).find(nav => !nav.hasAttribute('data-sticky') || nav.getAttribute('data-sticky') === 'false')
-    console.log('📍 Reference nav found:', referenceNav)
-    
-    // Only show sticky nav if we have a reference nav and it's scrolled out of view
-    if (referenceNav) {
-      const headerBottom = referenceNav.getBoundingClientRect().bottom + window.scrollY
-      const currentScroll = window.scrollY
-      console.log('📏 Header bottom:', headerBottom, 'Current scroll:', currentScroll)
-      console.log('🔄 Should show sticky?', currentScroll > headerBottom)
-      
-      const oldValue = showStickyNav.value
-      showStickyNav.value = window.scrollY > headerBottom
-      
-      if (oldValue !== showStickyNav.value) {
-        console.log('🎉 Sticky nav visibility changed:', showStickyNav.value ? 'SHOWING' : 'HIDING')
-      }
-    } else {
-      console.log('❌ No reference nav found')
+    if (currentNav && !showStickyNav.value) {
+      // When not sticky, use the nav's current bottom position as reference
+      const navBottom = currentNav.getBoundingClientRect().bottom + window.scrollY
+      showStickyNav.value = window.scrollY > navBottom
+    } else if (showStickyNav.value) {
+      // When sticky, check if we should hide it by scrolling back to top
+      const approximateHeaderHeight = 150
+      showStickyNav.value = window.scrollY > approximateHeaderHeight
     }
   }
 }
 
 onMounted(() => {
-  console.log('🚀 Nav component mounted - sticky:', props.sticky)
-  
   // Initialize viewport detection
   handleResize()
   window.addEventListener('resize', handleResize)
-  console.log('📱 Resize listener added')
   
   if (props.sticky) {
     window.addEventListener('scroll', handleScroll)
     handleScroll()
-    console.log('✅ Scroll listener added for sticky nav')
   }
 })
 
@@ -180,26 +146,194 @@ onUnmounted(() => {
   display: contents;
 }
 
-.tufte-nav .nav a {
+.nav-content {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Backward compatibility: direct anchor children (old flat structure) */
+.tufte-nav .nav-content > a {
   text-decoration: none !important;
   color: inherit;
   margin-right: 1rem;
 }
 
-.tufte-nav .nav a:hover {
+.tufte-nav .nav-content > a:hover {
   opacity: 0.7;
 }
 
-.tufte-nav .nav a:not(:last-child)::after {
+.tufte-nav .nav-content > a:not(:last-child)::after {
   content: var(--delimiter);
   margin-left: 0.5rem;
   color: inherit;
+}
+
+/* New list-based structure */
+.tufte-nav .nav-content > ul {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tufte-nav .nav-content > ul > li {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.tufte-nav .nav-content > ul > li > a {
+  text-decoration: none !important;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.tufte-nav .nav-content > ul > li > a:hover {
+  opacity: 0.7;
+}
+
+.tufte-nav .nav-content > ul > li:not(:last-child)::after {
+  content: var(--delimiter);
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  color: inherit;
+}
+
+
+/* Dropdown shows entire tree structure on first hover */
+.tufte-nav .nav-content ul ul {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #151515;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  min-width: 150px;
+  z-index: 1000;
+}
+
+/* Show dropdown on hover of first level item */
+.tufte-nav .nav-content li:hover > ul {
+  display: block;
+}
+
+/* All nested levels within dropdown are always visible */
+.tufte-nav .nav-content ul ul ul {
+  display: block;
+  position: static;
+  background: none;
+  box-shadow: none;
+  margin: 0.5rem 0 0 1.5rem;
+  padding: 0;
+}
+
+/* Children of non-last parents should draw continuation line for their parent's connection */
+.tufte-nav .nav-content ul ul li:not(:last-child) > ul::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: #666;
+  z-index: 1;
+}
+
+/* All nested list items */
+.tufte-nav .nav-content ul ul li {
+  position: relative;
+  margin: 0;
+  padding: 0.2rem 0;
+}
+
+.tufte-nav .nav-content ul ul li::after {
+  display: none;
+}
+
+/* Vertical line connecting all items except stops at last item - works at any level */
+.tufte-nav .nav-content ul ul li:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  bottom: -0.2rem;
+  width: 1px;
+  background-color: #666;
+  z-index: 1;
+}
+
+/* All nested anchors */
+.tufte-nav .nav-content ul ul a {
+  font-size: 1.2rem;
+  padding: 0 0 0 1.5rem;
+  text-decoration: none !important;
+  color: #ccc;
+  display: block;
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+}
+
+.tufte-nav .nav-content ul ul a:hover {
+  opacity: 0.7;
+  color: white;
+}
+
+/* Horizontal line (branch) - works at any level */
+.tufte-nav .nav-content ul ul a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 12px;
+  height: 1px;
+  background-color: #666;
+  z-index: 1;
+}
+
+/* Vertical line from top to middle for non-last items - works at any level */
+.tufte-nav .nav-content ul ul li:not(:last-child) a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -0.2rem;
+  height: calc(50% + 0.2rem);
+  width: 1px;
+  background-color: #666;
+  z-index: 1;
+}
+
+/* Vertical line from top to middle for last item (shorter) - works at any level */
+.tufte-nav .nav-content ul ul li:last-child a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -0.2rem;
+  height: calc(50% + 0.2rem);
+  width: 1px;
+  background-color: #666;
+  z-index: 1;
 }
 
 .tufte-nav .nav .github-link {
   display: inline-flex;
   align-items: center;
   vertical-align: middle;
+}
+
+.tufte-nav .nav .github-link::before {
+  content: var(--delimiter);
+  margin-right: 0.5rem;
+  color: inherit;
 }
 
 .tufte-nav .nav .github-link svg {
@@ -214,7 +348,7 @@ onUnmounted(() => {
   height: 2.5rem;
   border: 1px solid white;
   border-radius: 8px;
-  background: #111;
+  background: #151515;
   transition: all 0.4s ease;
   overflow: hidden;
   z-index: 1000;
@@ -295,7 +429,8 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.tufte-nav .burger-content a {
+/* Backward compatibility: direct anchor children (old flat structure) */
+.tufte-nav .burger-content > a {
   font-size: 1.4rem;
   padding: 0.3rem 0;
   margin-right: 0 !important;
@@ -304,17 +439,127 @@ onUnmounted(() => {
   border: none;
 }
 
-.tufte-nav .burger-content .github-link svg {
-  width: 1.5em;
-  height: 1.5em;
-}
-
-.tufte-nav .burger-content a:hover {
+.tufte-nav .burger-content > a:hover {
   opacity: 0.7;
 }
 
-.tufte-nav .burger-content a:not(:last-child)::after {
+.tufte-nav .burger-content > a:not(:last-child)::after {
   display: none;
+}
+
+/* New list-based structure for burger menu */
+.tufte-nav .burger-content > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.tufte-nav .burger-content ul li {
+  margin: 0;
+}
+
+.tufte-nav .burger-content ul li::after {
+  display: none;
+}
+
+.tufte-nav .burger-content ul > li > a {
+  font-size: 1.4rem;
+  padding: 0.3rem 0;
+  text-decoration: none !important;
+  color: white;
+  border: none;
+  display: block;
+}
+
+.tufte-nav .burger-content ul > li > a:hover {
+  opacity: 0.7;
+}
+
+/* Use same recursive tree structure as dropdown - adapted for hamburger layout */
+.tufte-nav .burger-content ul ul {
+  display: block;
+  list-style: none;
+  margin: 0.5rem 0 0 1.5rem;
+  padding: 0;
+  position: relative;
+}
+
+
+/* All nested list items (same logic as dropdown) */
+.tufte-nav .burger-content ul ul li {
+  position: relative;
+  margin: 0;
+  padding: 0.2rem 0;
+}
+
+.tufte-nav .burger-content ul ul li::after {
+  display: none;
+}
+
+/* Vertical line connecting items (same logic as dropdown) */
+.tufte-nav .burger-content ul ul li:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  bottom: -0.2rem;
+  width: 1px;
+  background-color: #666;
+  z-index: 1;
+}
+
+/* Parent items with children need longer connecting lines upward */
+.tufte-nav .burger-content ul ul li:not(:last-child):has(ul)::before {
+  top: -0.5rem;
+}
+
+/* All nested anchors (same logic as dropdown, different colors for hamburger) */
+.tufte-nav .burger-content ul ul a {
+  font-size: 1.2rem;
+  padding: 0 0 0 1.5rem;
+  text-decoration: none !important;
+  color: #ccc;
+  border: none;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+.tufte-nav .burger-content ul ul a:hover {
+  opacity: 0.7;
+  color: white;
+}
+
+/* Horizontal line (branch) - same as dropdown */
+.tufte-nav .burger-content ul ul a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 12px;
+  height: 1px;
+  background-color: #666;
+  z-index: 1;
+}
+
+/* Vertical line from top to middle - same as dropdown */
+.tufte-nav .burger-content ul ul a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -0.2rem;
+  height: calc(50% + 0.2rem);
+  width: 1px;
+  background-color: #666;
+  z-index: 1;
+}
+
+.tufte-nav .burger-content .github-link svg {
+  width: 1.5em;
+  height: 1.5em;
 }
 
 /* All responsive behavior now handled by JavaScript v-show directives */

@@ -1,33 +1,50 @@
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 const props = withDefaults(defineProps(), {
     delimiter: ' · ',
     placement: 'top-right',
     sticky: false
 });
 const mobileMenuOpen = ref(false);
-// Sticky navigation logic
+// Navigation state
 const showStickyNav = ref(false);
+const isMobileViewport = ref(false);
+// Display logic: Nav shows when NOT mobile AND (NOT sticky OR NOT sticky-active)
+const showNav = computed(() => {
+    return !isMobileViewport.value && (!props.sticky || !showStickyNav.value);
+});
+// Display logic: Burger shows when mobile OR sticky-active  
+const showBurger = computed(() => {
+    return isMobileViewport.value || (props.sticky && showStickyNav.value);
+});
+const handleResize = () => {
+    isMobileViewport.value = window.innerWidth <= 760;
+};
 const handleScroll = () => {
     if (props.sticky) {
-        // Find all Nav components in the DOM
-        const allNavs = document.querySelectorAll('.tufte-nav');
-        const currentNav = document.querySelector(`[data-sticky="${props.sticky}"]`);
-        // Find the first non-sticky nav (header nav) to use as reference
-        const referenceNav = Array.from(allNavs).find(nav => !nav.hasAttribute('data-sticky') || nav.getAttribute('data-sticky') === 'false');
-        // Only show sticky nav if we have a reference nav and it's scrolled out of view
-        if (referenceNav) {
-            const headerBottom = referenceNav.getBoundingClientRect().bottom + window.scrollY;
-            showStickyNav.value = window.scrollY > headerBottom;
+        const currentNav = document.querySelector(`[data-sticky="true"]`);
+        if (currentNav && !showStickyNav.value) {
+            // When not sticky, use the nav's current bottom position as reference
+            const navBottom = currentNav.getBoundingClientRect().bottom + window.scrollY;
+            showStickyNav.value = window.scrollY > navBottom;
+        }
+        else if (showStickyNav.value) {
+            // When sticky, check if we should hide it by scrolling back to top
+            const approximateHeaderHeight = 150;
+            showStickyNav.value = window.scrollY > approximateHeaderHeight;
         }
     }
 };
 onMounted(() => {
+    // Initialize viewport detection
+    handleResize();
+    window.addEventListener('resize', handleResize);
     if (props.sticky) {
         window.addEventListener('scroll', handleScroll);
         handleScroll();
     }
 });
 onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
     if (props.sticky) {
         window.removeEventListener('scroll', handleScroll);
     }
@@ -47,8 +64,6 @@ let __VLS_directives;
 __VLS_asFunctionalElement(__VLS_elements.nav, __VLS_elements.nav)({
     ...{ class: "tufte-nav" },
     ...{ class: ({
-            'force-mobile': __VLS_ctx.burger === true,
-            'force-desktop': __VLS_ctx.burger === false,
             'sticky-active': __VLS_ctx.sticky && __VLS_ctx.showStickyNav
         }) },
     'data-sticky': (__VLS_ctx.sticky),
@@ -60,11 +75,16 @@ __VLS_asFunctionalElement(__VLS_elements.nav, __VLS_elements.nav)({
             zIndex: __VLS_ctx.sticky && __VLS_ctx.showStickyNav ? '2000' : 'auto'
         }) },
 });
-__VLS_asFunctionalDirective(__VLS_directives.vShow)(null, { ...__VLS_directiveBindingRestFields, value: (!__VLS_ctx.sticky || __VLS_ctx.showStickyNav) }, null, null);
 // @ts-ignore
-[burger, burger, sticky, sticky, sticky, sticky, sticky, sticky, sticky, showStickyNav, showStickyNav, showStickyNav, showStickyNav, showStickyNav, showStickyNav, delimiter, vShow,];
+[sticky, sticky, sticky, sticky, sticky, sticky, showStickyNav, showStickyNav, showStickyNav, showStickyNav, showStickyNav, delimiter,];
 __VLS_asFunctionalElement(__VLS_elements.div, __VLS_elements.div)({
-    ...{ class: "nav-desktop" },
+    ...{ class: "nav" },
+});
+__VLS_asFunctionalDirective(__VLS_directives.vShow)(null, { ...__VLS_directiveBindingRestFields, value: (__VLS_ctx.showNav) }, null, null);
+// @ts-ignore
+[vShow, showNav,];
+__VLS_asFunctionalElement(__VLS_elements.div, __VLS_elements.div)({
+    ...{ class: "nav-content" },
 });
 var __VLS_0 = {};
 if (__VLS_ctx.github) {
@@ -90,15 +110,16 @@ if (__VLS_ctx.github) {
     });
 }
 __VLS_asFunctionalElement(__VLS_elements.div, __VLS_elements.div)({
-    ...{ class: "mobile-menu" },
+    ...{ class: "burger" },
     ...{ class: ([
-            { 'mobile-menu-expanded': __VLS_ctx.mobileMenuOpen },
-            { 'mobile-menu-inline': __VLS_ctx.inline },
-            `mobile-menu-${__VLS_ctx.placement}`
+            { 'burger-expanded': __VLS_ctx.mobileMenuOpen },
+            { 'burger-inline': __VLS_ctx.inline },
+            `burger-${__VLS_ctx.placement}`
         ]) },
 });
+__VLS_asFunctionalDirective(__VLS_directives.vShow)(null, { ...__VLS_directiveBindingRestFields, value: (__VLS_ctx.showBurger) }, null, null);
 // @ts-ignore
-[mobileMenuOpen, inline, placement,];
+[vShow, mobileMenuOpen, inline, placement, showBurger,];
 __VLS_asFunctionalElement(__VLS_elements.button, __VLS_elements.button)({
     ...{ onClick: (...[$event]) => {
             __VLS_ctx.mobileMenuOpen = !__VLS_ctx.mobileMenuOpen;
@@ -130,7 +151,7 @@ __VLS_asFunctionalElement(__VLS_elements.span, __VLS_elements.span)({
 // @ts-ignore
 [mobileMenuOpen,];
 __VLS_asFunctionalElement(__VLS_elements.div, __VLS_elements.div)({
-    ...{ class: "mobile-menu-content" },
+    ...{ class: "burger-content" },
 });
 __VLS_asFunctionalDirective(__VLS_directives.vShow)(null, { ...__VLS_directiveBindingRestFields, value: (__VLS_ctx.mobileMenuOpen) }, null, null);
 // @ts-ignore
@@ -159,14 +180,13 @@ if (__VLS_ctx.github) {
     });
 }
 /** @type {__VLS_StyleScopedClasses['tufte-nav']} */ ;
-/** @type {__VLS_StyleScopedClasses['force-mobile']} */ ;
-/** @type {__VLS_StyleScopedClasses['force-desktop']} */ ;
 /** @type {__VLS_StyleScopedClasses['sticky-active']} */ ;
-/** @type {__VLS_StyleScopedClasses['nav-desktop']} */ ;
+/** @type {__VLS_StyleScopedClasses['nav']} */ ;
+/** @type {__VLS_StyleScopedClasses['nav-content']} */ ;
 /** @type {__VLS_StyleScopedClasses['github-link']} */ ;
-/** @type {__VLS_StyleScopedClasses['mobile-menu']} */ ;
-/** @type {__VLS_StyleScopedClasses['mobile-menu-expanded']} */ ;
-/** @type {__VLS_StyleScopedClasses['mobile-menu-inline']} */ ;
+/** @type {__VLS_StyleScopedClasses['burger']} */ ;
+/** @type {__VLS_StyleScopedClasses['burger-expanded']} */ ;
+/** @type {__VLS_StyleScopedClasses['burger-inline']} */ ;
 /** @type {__VLS_StyleScopedClasses['hamburger-button']} */ ;
 /** @type {__VLS_StyleScopedClasses['hamburger-line']} */ ;
 /** @type {__VLS_StyleScopedClasses['hamburger-line-active']} */ ;
@@ -174,7 +194,7 @@ if (__VLS_ctx.github) {
 /** @type {__VLS_StyleScopedClasses['hamburger-line-active']} */ ;
 /** @type {__VLS_StyleScopedClasses['hamburger-line']} */ ;
 /** @type {__VLS_StyleScopedClasses['hamburger-line-active']} */ ;
-/** @type {__VLS_StyleScopedClasses['mobile-menu-content']} */ ;
+/** @type {__VLS_StyleScopedClasses['burger-content']} */ ;
 /** @type {__VLS_StyleScopedClasses['github-link']} */ ;
 // @ts-ignore
 var __VLS_1 = __VLS_0, __VLS_3 = __VLS_2;
@@ -183,6 +203,8 @@ const __VLS_self = (await import('vue')).defineComponent({
     setup: () => ({
         mobileMenuOpen: mobileMenuOpen,
         showStickyNav: showStickyNav,
+        showNav: showNav,
+        showBurger: showBurger,
     }),
     __typeProps: {},
     props: {},
