@@ -1,44 +1,41 @@
 <template>
   <article>
-    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; max-width: 90%; flex-wrap: wrap; gap: 1rem;">
-      <div style="flex-shrink: 0;">
-        <h1 style="margin: 0; white-space: nowrap;">Vue-Tufte</h1>
-        <Subtitle style="white-space: nowrap;"><a href="https://edwardtufte.github.io/tufte-css/" target="_blank">Tufte CSS</a> for Vue</Subtitle>
-      </div>
-      <Nav sticky github="https://github.com/bkeane/vue-tufte">
-        <ul>
-          <li><a href="#installation">Install</a></li>
-          <li>
-            <a href="#configuration">Config</a>
-            <ul>
-              <li><a href="#individual-import">Individual Import</a></li>
-              <li><a href="#global-install">Global Install</a></li>
-            </ul>
-          </li>
-          <li>
-            <a href="#components">Components</a>
-            <ul>
-              <li><a href="#text-components">Text</a></li>
-              <li>
-                <a href="#margin-notes">Margin Notes</a>
-                <ul>
-                  <li><a href="#sidenotes">Sidenotes</a></li>
-                  <li><a href="#margin-notes-basic">Basic Notes</a></li>
-                </ul>
-              </li>
-              <li>
-                <a href="#figures">Figures</a>
-                <ul>
-                  <li><a href="#standard-figures">Standard</a></li>
-                  <li><a href="#full-width-figures">Full-Width</a></li>
-                  <li><a href="#margin-figures">Margin</a></li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </Nav>
-    </div>
+    <h1>Vue-Tufte</h1>
+    <Subtitle><a href="https://edwardtufte.github.io/tufte-css/">Tufte CSS</a> for Vue</Subtitle>
+      
+    <Nav sticky placement="top-right" github="https://github.com/bkeane/vue-tufte">
+      <ul>
+        <li><a href="#installation">Install</a></li>
+        <li>
+          <a href="#configuration">Config</a>
+          <ul>
+            <li><a href="#individual-import">Individual Import</a></li>
+            <li><a href="#global-install">Global Install</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#components">Components</a>
+          <ul>
+            <li><a href="#text-components">Text</a></li>
+            <li>
+              <a href="#margin-notes">Margin Notes</a>
+              <ul>
+                <li><a href="#sidenotes">Sidenotes</a></li>
+                <li><a href="#margin-notes-basic">Basic Notes</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#figures">Figures</a>
+              <ul>
+                <li><a href="#standard-figures">Standard</a></li>
+                <li><a href="#full-width-figures">Full-Width</a></li>
+                <li><a href="#margin-figures">Margin</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </Nav>
 
     <section>
       <p>
@@ -66,7 +63,7 @@
       <p>Optional: Pre-load specific languages/themes for performance:</p>
       <CodeBlock language="javascript">{{ shikiConfigFull }}</CodeBlock>
 
-      <p>Browse available <a href="https://shiki.style/languages" target="_blank">languages</a> and <a href="https://shiki.style/themes" target="_blank">themes</a> in the Shiki docs.</p>
+      <p>Browse available <a href="https://shiki.style/languages">languages</a> and <a href="https://shiki.style/themes">themes</a> in the Shiki docs.</p>
     </section>
 
     <section>
@@ -181,14 +178,6 @@
 
 <script setup lang="ts">
 // Components are registered globally via the plugin in main.ts
-
-// Nav items for demo
-const navItems = [
-  { text: 'Home', href: '#home' },
-  { text: 'About', href: '#about' },
-  { text: 'Work', href: '#work' },
-  { text: 'Contact', href: '#contact' }
-]
 
 // Code examples
 const individualImport = `import { NewThought, Sidenote, Figure } from 'vue-tufte'`

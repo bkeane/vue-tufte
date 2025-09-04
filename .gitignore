@@ -23,6 +23,7 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+*.vue.js
 
 # Coverage
 coverage
