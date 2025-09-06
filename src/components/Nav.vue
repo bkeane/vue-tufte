@@ -5,6 +5,7 @@
       class="burger"
       :class="[
         { 'burger-expanded': mobileMenuOpen },
+        { 'overflow-constrained': mobileMenuOpen && isOverflowing },
         `burger-${placement}`
       ]"
     >
@@ -19,7 +20,7 @@
         <span class="hamburger-line" :class="{ 'hamburger-line-active': mobileMenuOpen }"></span>
       </button>
 
-      <div class="burger-content" v-show="mobileMenuOpen">
+      <div class="burger-content" v-if="mobileMenuOpen">
         <slot />
         <a v-if="github" :href="github" target="_blank" rel="noopener noreferrer" class="github-link">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-label="GitHub">
@@ -32,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 
 interface Props {
   github?: string
@@ -44,6 +45,31 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const mobileMenuOpen = ref(false)
+const isOverflowing = ref(false)
+
+const checkOverflow = async () => {
+  if (!mobileMenuOpen.value) {
+    isOverflowing.value = false
+    return
+  }
+  
+  await nextTick()
+  const burger = document.querySelector('.burger-expanded')
+  if (burger) {
+    const rect = burger.getBoundingClientRect()
+    isOverflowing.value = rect.bottom > window.innerHeight || rect.top < 0
+  }
+}
+
+watch(mobileMenuOpen, checkOverflow)
+
+onMounted(() => {
+  window.addEventListener('resize', checkOverflow)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkOverflow)
+})
 </script>
 
 <style>
@@ -72,6 +98,34 @@ const mobileMenuOpen = ref(false)
   min-width: 200px;
   max-width: 80vw;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.tufte-nav .burger-expanded.overflow-constrained {
+  height: calc(100vh - 2rem);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+
+/* Hide webkit scrollbar completely */
+.tufte-nav .burger-expanded.overflow-constrained::-webkit-scrollbar {
+  display: none;
+}
+
+
+
+/* Adjust constrained height and position */
+.tufte-nav .burger-top-left.burger-expanded.overflow-constrained,
+.tufte-nav .burger-top-right.burger-expanded.overflow-constrained {
+  height: calc(100vh - 2rem);
+  top: 1rem;
+}
+
+.tufte-nav .burger-bottom-left.burger-expanded.overflow-constrained,
+.tufte-nav .burger-bottom-right.burger-expanded.overflow-constrained {
+  height: calc(100vh - 2rem);
+  bottom: 1rem;
+  top: auto;
 }
 
 /* Simple placement with ultra-wide constraints */
