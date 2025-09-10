@@ -104,6 +104,8 @@ onUnmounted(() => {
   height: calc(100vh - 2rem);
   overflow-y: auto;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 

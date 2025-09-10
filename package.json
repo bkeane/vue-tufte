@@ -30,7 +30,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "vite --config docs/vite.config.ts docs",
+    "dev": "vite --config docs/vite.config.ts docs --host 0.0.0.0",
     "build": "run-p type-check \"build-only {@}\" --",
     "build:docs": "vite build --config docs/vite.config.ts docs --base=/vue-tufte/",
     "build-only": "vite build",
