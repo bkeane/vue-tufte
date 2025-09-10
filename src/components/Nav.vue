@@ -3,7 +3,10 @@
   <nav class="tufte-nav">
     <div 
       class="burger"
-      :style="titleAlign && placement === 'top-right' && !isSticky ? { top: headingTop } : {}"
+      :style="{
+        ...(titleAlign && placement === 'top-right' && !isSticky ? { top: headingTop } : {}),
+        ...(isOverflowing ? { '--dynamic-max-height': dynamicMaxHeight } : {})
+      }"
       :class="[
         { 'burger-expanded': mobileMenuOpen },
         { 'overflow-constrained': mobileMenuOpen && isOverflowing },
@@ -56,6 +59,8 @@ const isSticky = ref(false)
 const headingTop = ref('4rem')
 const headingTopPx = ref(60) // Store as number for scroll calculations
 
+const dynamicMaxHeight = ref('94vh')
+
 const checkOverflow = async () => {
   if (!mobileMenuOpen.value) {
     isOverflowing.value = false
@@ -63,11 +68,23 @@ const checkOverflow = async () => {
   }
   
   await nextTick()
-  const burger = document.querySelector('.burger-expanded')
-  if (burger) {
-    const rect = burger.getBoundingClientRect()
-    isOverflowing.value = rect.bottom > window.innerHeight || rect.top < 0
-  }
+  // Add small delay to avoid race conditions with resize
+  setTimeout(() => {
+    const burger = document.querySelector('.burger-expanded')
+    if (burger) {
+      const rect = burger.getBoundingClientRect()
+      const shouldConstrain = rect.bottom > window.innerHeight - 80
+      
+      if (shouldConstrain) {
+        // Calculate max height based on burger's current position
+        const bottomMargin = isSticky.value ? 80 : 40 // Less margin when not sticky
+        const availableHeight = window.innerHeight - rect.top - bottomMargin
+        dynamicMaxHeight.value = `${availableHeight}px`
+      }
+      
+      isOverflowing.value = shouldConstrain
+    }
+  }, 50)
 }
 
 const handleClickOutside = (event: Event) => {
@@ -162,69 +179,28 @@ onUnmounted(() => {
 .tufte-nav .burger-expanded {
   width: fit-content;
   height: fit-content;
-  min-width: 200px;
+  min-width: 250px;
   max-width: 80vw;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
+.tufte-nav .burger-expanded:not(.burger-sticky) {
+  min-width: 250px;
+  max-width: 95vw;
+}
+
 .tufte-nav .burger-expanded.overflow-constrained {
-  height: calc(100vh - 4rem);
+  max-height: var(--dynamic-max-height, 94vh);
   overflow-y: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
 }
-
-/* Mobile-specific base constraint */
-@media (max-width: 768px) {
-  .tufte-nav .burger-expanded.overflow-constrained {
-    height: calc(100vh - 8rem);
-    max-height: calc(100vh - 8rem);
-    box-sizing: border-box;
-  }
-}
-
 
 /* Hide webkit scrollbar completely */
 .tufte-nav .burger-expanded.overflow-constrained::-webkit-scrollbar {
   display: none;
 }
 
-
-
-/* Adjust constrained height and position */
-.tufte-nav .burger-top-left.burger-expanded.overflow-constrained,
-.tufte-nav .burger-top-right.burger-expanded.overflow-constrained {
-  height: calc(100vh - 4rem);
-}
-
-.tufte-nav .burger-top-right.burger-sticky.burger-expanded.overflow-constrained {
-  top: 1rem;
-}
-
-.tufte-nav .burger-bottom-left.burger-expanded.overflow-constrained,
-.tufte-nav .burger-bottom-right.burger-expanded.overflow-constrained {
-  height: calc(100vh - 4rem);
-  bottom: 1rem;
-  top: auto;
-}
-
-/* Mobile-specific constraints for dynamic viewport issues */
-@media (max-width: 768px) {
-  .tufte-nav .burger-top-left.burger-expanded.overflow-constrained,
-  .tufte-nav .burger-top-right.burger-expanded.overflow-constrained {
-    height: calc(100vh - 8rem);
-    max-height: calc(100vh - 8rem);
-    box-sizing: border-box;
-  }
-
-  .tufte-nav .burger-bottom-left.burger-expanded.overflow-constrained,
-  .tufte-nav .burger-bottom-right.burger-expanded.overflow-constrained {
-    height: calc(100vh - 8rem);
-    max-height: calc(100vh - 8rem);
-    box-sizing: border-box;
-  }
-}
 
 /* Simple placement with ultra-wide constraints */
 .tufte-nav .burger-top-left { 
