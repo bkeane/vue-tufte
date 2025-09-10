@@ -61,14 +61,29 @@ const checkOverflow = async () => {
   }
 }
 
+const handleClickOutside = (event: Event) => {
+  if (!mobileMenuOpen.value) return
+  
+  const burger = document.querySelector('.burger')
+  const target = event.target as Node
+  
+  if (burger && !burger.contains(target)) {
+    mobileMenuOpen.value = false
+  }
+}
+
 watch(mobileMenuOpen, checkOverflow)
 
 onMounted(() => {
   window.addEventListener('resize', checkOverflow)
+  document.addEventListener('click', handleClickOutside)
+  document.addEventListener('touchstart', handleClickOutside)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkOverflow)
+  document.removeEventListener('click', handleClickOutside)
+  document.removeEventListener('touchstart', handleClickOutside)
 })
 </script>
 
@@ -87,7 +102,6 @@ onUnmounted(() => {
   border: 1px solid white;
   border-radius: 8px;
   background: #151515;
-  transition: all 0.4s ease;
   overflow: hidden;
   z-index: 1000;
 }
@@ -101,11 +115,20 @@ onUnmounted(() => {
 }
 
 .tufte-nav .burger-expanded.overflow-constrained {
-  height: calc(100vh - 2rem);
+  height: calc(100vh - 4rem);
   overflow-y: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+}
+
+/* Mobile-specific base constraint */
+@media (max-width: 768px) {
+  .tufte-nav .burger-expanded.overflow-constrained {
+    height: calc(100vh - 8rem);
+    max-height: calc(100vh - 8rem);
+    box-sizing: border-box;
+  }
 }
 
 
@@ -119,15 +142,32 @@ onUnmounted(() => {
 /* Adjust constrained height and position */
 .tufte-nav .burger-top-left.burger-expanded.overflow-constrained,
 .tufte-nav .burger-top-right.burger-expanded.overflow-constrained {
-  height: calc(100vh - 2rem);
+  height: calc(100vh - 4rem);
   top: 1rem;
 }
 
 .tufte-nav .burger-bottom-left.burger-expanded.overflow-constrained,
 .tufte-nav .burger-bottom-right.burger-expanded.overflow-constrained {
-  height: calc(100vh - 2rem);
+  height: calc(100vh - 4rem);
   bottom: 1rem;
   top: auto;
+}
+
+/* Mobile-specific constraints for dynamic viewport issues */
+@media (max-width: 768px) {
+  .tufte-nav .burger-top-left.burger-expanded.overflow-constrained,
+  .tufte-nav .burger-top-right.burger-expanded.overflow-constrained {
+    height: calc(100vh - 8rem);
+    max-height: calc(100vh - 8rem);
+    box-sizing: border-box;
+  }
+
+  .tufte-nav .burger-bottom-left.burger-expanded.overflow-constrained,
+  .tufte-nav .burger-bottom-right.burger-expanded.overflow-constrained {
+    height: calc(100vh - 8rem);
+    max-height: calc(100vh - 8rem);
+    box-sizing: border-box;
+  }
 }
 
 /* Simple placement with ultra-wide constraints */
