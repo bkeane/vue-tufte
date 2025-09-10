@@ -3,7 +3,7 @@
     <h1>Vue-Tufte</h1>
     <Subtitle><a href="https://edwardtufte.github.io/tufte-css/">Tufte CSS</a> for Vue</Subtitle>
       
-    <Nav github="https://github.com/bkeane/vue-tufte">
+    <Nav github="https://github.com/bkeane/vue-tufte" sticky title-align>
       <ul>
         <li><a href="#installation">Install</a></li>
         <li>
