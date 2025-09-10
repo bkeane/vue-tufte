@@ -3,9 +3,11 @@
   <nav class="tufte-nav">
     <div 
       class="burger"
+      :style="titleAlign && placement === 'top-right' && !isSticky ? { top: headingTop } : {}"
       :class="[
         { 'burger-expanded': mobileMenuOpen },
         { 'overflow-constrained': mobileMenuOpen && isOverflowing },
+        { 'burger-sticky': isSticky && sticky },
         `burger-${placement}`
       ]"
     >
@@ -38,14 +40,21 @@ import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 interface Props {
   github?: string
   placement?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+  sticky?: boolean
+  titleAlign?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placement: 'top-right'
+  placement: 'top-right',
+  sticky: false,
+  titleAlign: false
 })
 
 const mobileMenuOpen = ref(false)
 const isOverflowing = ref(false)
+const isSticky = ref(false)
+const headingTop = ref('4rem')
+const headingTopPx = ref(60) // Store as number for scroll calculations
 
 const checkOverflow = async () => {
   if (!mobileMenuOpen.value) {
@@ -72,16 +81,45 @@ const handleClickOutside = (event: Event) => {
   }
 }
 
+const calculateHeadingPosition = () => {
+  const firstHeading = document.querySelector('h1, h2, h3, h4, h5')
+  if (firstHeading) {
+    const rect = firstHeading.getBoundingClientRect()
+    const topPosition = rect.top + window.scrollY
+    headingTop.value = `${topPosition}px`
+    headingTopPx.value = topPosition
+  }
+}
+
+const handleScroll = () => {
+  if (props.sticky) {
+    const threshold = props.titleAlign ? Math.max(0, headingTopPx.value - 15) : 45
+    const shouldBeSticky = window.scrollY >= threshold
+    isSticky.value = shouldBeSticky
+  }
+}
+
 watch(mobileMenuOpen, checkOverflow)
 
+const handleResize = () => {
+  calculateHeadingPosition()
+  checkOverflow()
+}
+
 onMounted(() => {
-  window.addEventListener('resize', checkOverflow)
+  window.addEventListener('resize', handleResize)
+  window.addEventListener('scroll', handleScroll)
   document.addEventListener('click', handleClickOutside)
   document.addEventListener('touchstart', handleClickOutside)
+  
+  // Calculate heading position and set initial sticky state
+  calculateHeadingPosition()
+  handleScroll()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', checkOverflow)
+  window.removeEventListener('resize', handleResize)
+  window.removeEventListener('scroll', handleScroll)
   document.removeEventListener('click', handleClickOutside)
   document.removeEventListener('touchstart', handleClickOutside)
 })
@@ -99,11 +137,26 @@ onUnmounted(() => {
   position: fixed;
   width: 2.5rem;
   height: 2.5rem;
-  border: 1px solid white;
+  border: 1px solid transparent;
   border-radius: 8px;
   background: #151515;
   overflow: hidden;
   z-index: 1000;
+  transition: border-color 0.3s ease;
+}
+
+.tufte-nav .burger-top-right:not(.burger-sticky) {
+  position: absolute;
+  border-color: transparent;
+}
+
+.tufte-nav .burger-top-right.burger-sticky {
+  position: fixed;
+  border-color: white;
+}
+
+.tufte-nav .burger-expanded {
+  border-color: white !important;
 }
 
 .tufte-nav .burger-expanded {
@@ -143,6 +196,9 @@ onUnmounted(() => {
 .tufte-nav .burger-top-left.burger-expanded.overflow-constrained,
 .tufte-nav .burger-top-right.burger-expanded.overflow-constrained {
   height: calc(100vh - 4rem);
+}
+
+.tufte-nav .burger-top-right.burger-sticky.burger-expanded.overflow-constrained {
   top: 1rem;
 }
 
@@ -178,6 +234,11 @@ onUnmounted(() => {
 .tufte-nav .burger-top-right { 
   top: 1rem; 
   right: max(1rem, calc((100vw - 1400px) / 2)); 
+}
+
+.tufte-nav .burger-top-right.burger-sticky {
+  top: 1rem;
+  right: max(1rem, calc((100vw - 1400px) / 2));
 }
 .tufte-nav .burger-bottom-left { 
   bottom: 1rem; 
