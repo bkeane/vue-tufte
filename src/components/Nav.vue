@@ -179,7 +179,6 @@ onUnmounted(() => {
 .tufte-nav .burger-expanded {
   width: fit-content;
   height: fit-content;
-  min-width: 250px;
   max-width: 80vw;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
