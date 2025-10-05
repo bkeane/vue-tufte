@@ -185,7 +185,6 @@ onUnmounted(() => {
 }
 
 .tufte-nav .burger-expanded:not(.burger-sticky) {
-  min-width: 250px;
   max-width: 95vw;
 }
 
